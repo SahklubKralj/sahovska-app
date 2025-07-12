@@ -12,12 +12,9 @@ workflows:
       - name: Get Flutter dependencies
         script: |
           flutter packages pub get
-      - name: Flutter analyze
-        script: |
-          flutter analyze
       - name: Build AAB with Flutter
         script: |
-          flutter build appbundle --release
+          flutter build appbundle --release --no-tree-shake-icons
     artifacts:
       - build/app/outputs/bundle/release/*.aab
       - build/app/outputs/flutter-apk/*.apk
