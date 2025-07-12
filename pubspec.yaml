@@ -31,7 +31,7 @@ dependencies:
   provider: ^6.1.1
   
   # Navigation
-  go_router: ^16.0.0
+  go_router: ^15.1.2
   
   # Utility
   intl: ^0.18.1
