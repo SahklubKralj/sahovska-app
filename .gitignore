@@ -1,0 +1,239 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code related
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/flutter_export_environment.sh
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/flutter_sdk
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# PRODUCTION SECURITY FILES - NEVER COMMIT
+# Android signing
+android/key.properties
+android/upload-keystore.jks
+android/*.jks
+android/*.keystore
+
+# Firebase configuration files with sensitive data
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+ios/firebase_app_id_file.json
+
+# Environment variables and secrets
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+
+# iOS specific sensitive files
+ios/Runner/Runner.entitlements
+ios/Runner.xcworkspace/xcuserdata/
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcodeproj/project.xcworkspace/xcuserdata/
+ios/ServiceDefinitions.json
+ios/Runner/RunnerTests/
+ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# Firebase Emulator
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Local development
+local.properties
+key.properties
+
+# API keys and credentials
+**/apikey.txt
+**/secrets.dart
+**/config.dart
+**/credentials.json
+
+# Testing coverage
+coverage/
+test/coverage/
+
+# IDE specific files
+.metadata
+.flutter-plugins-dependencies
+
+# Web specific
+/web/*.js.map
+/web/manifest.json
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+
+# Log files
+*.log
+logs/
+
+# Build artifacts
+*.ipa
+*.apk
+*.aab
+*.app
+
+# Archive files
+*.zip
+*.tar.gz
+*.7z
+
+# Backup files
+*.backup
+*.bak
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files that might contain secrets
+config/production.json
+config/staging.json
+
+# Fastlane (iOS deployment)
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+
+# Generated files
+**/*.g.dart
+**/*.freezed.dart
+**/*.mocks.dart
+
+# Platform specific build files
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+android/local.properties
+
+# Xcode user-specific files
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcworkspace/xcuserdata/
+
+# CocoaPods
+ios/Pods/
+ios/Podfile.lock
+
+# Performance monitoring
+performance.log
+*.perf
+
+# Dependency directories
+node_modules/
+
+# Package files
+*.tgz
+*.tar.gz
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Debug symbols
+*.debug
+*.dSYM/
+
+# Temporary build files
+.build/
+build/app/intermediates/
+
+# Local keystore files
+keystore.jks
+keystore.properties
+upload-keystore.jks
+
+# Analytics and tracking files
+analytics.json
+tracking.json
+
+# User-specific files
+user.json
+users.json
+
+# Sensitive documentation
+SENSITIVE.md
+PRIVATE.md
+INTERNAL.md
+
+# Production deployment scripts with credentials
+deploy.sh
+deploy.bat
+release.sh
+
+# Test data with potential sensitive information
+test_data/
+test_users.json
+
+# Temporary editor files
+*~
+.#*
+#*#
+
+# Credentials and certificates
+*.p12
+*.cer
+*.mobileprovision
+*.certSigningRequest
+
+# Local storage
+storage/
+uploads/
+temp/
+
+# Error logs
+error.log
+crash.log
+debug.log
+
+# Performance logs
+performance/
+profiling/
+
+# Backup and archive
+backup/
+archive/
+
+# IMPORTANT: Always check this file before committing to ensure no sensitive data is tracked!

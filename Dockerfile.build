@@ -1,0 +1,22 @@
+FROM cirrusci/flutter:3.24.5
+
+# Install additional dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY . .
+
+# Get dependencies
+RUN flutter pub get
+
+# Build AAB
+RUN flutter build appbundle --release
+
+# Output will be in build/app/outputs/bundle/release/app-release.aab

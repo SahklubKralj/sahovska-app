@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(keytool:*)",
+      "Bash(java:*)",
+      "Bash(\"/mnt/c/Program Files/Android/Android Studio/jbr/bin/keytool.exe\" -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload)",
+      "Bash(\"/mnt/c/Program Files/Android/Android Studio/jbr/bin/keytool.exe\" -genkey -v -keystore upload-keystore.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000 -storepass mali2025genijalci -keypass plavi2025genijalci -dname \"CN=Sahovski Klub, OU=Sahovski Klub, O=Sahovski Klub, L=Novi Sad, ST=Vojvodina, C=RS\")",
+      "Bash(export:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(./flutter/bin/flutter.bat build appbundle --release)",
+      "Bash(./flutter/bin/flutter build appbundle --release)",
+      "Bash(\"/mnt/c/Program Files/Android/Android Studio/jbr/bin/java\" -version)",
+      "Bash(\"/mnt/c/Program Files/Android/Android Studio/jbr/bin/java.exe\" -version)"
+    ],
+    "deny": []
+  }
+}

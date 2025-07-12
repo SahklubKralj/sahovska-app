@@ -1,0 +1,165 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions for storage security
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isValidImageSize() {
+      return request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Notification images - public read, admin write
+    match /notifications/{imageId} {
+      // Anyone can read notification images (public content)
+      allow read: if true;
+      
+      // Only admins can upload notification images
+      allow write: if isAdmin() && 
+        isValidImageType() && 
+        isValidImageSize();
+      
+      // Only admins can delete notification images
+      allow delete: if isAdmin();
+    }
+    
+    // User avatars - user-specific access
+    match /avatars/{userId}/{imageId} {
+      // Anyone can read avatar images (public profiles)
+      allow read: if true;
+      
+      // Users can upload their own avatars
+      allow write: if isOwner(userId) && 
+        isValidImageType() && 
+        isValidImageSize();
+      
+      // Users can delete their own avatars
+      allow delete: if isOwner(userId);
+      
+      // Admins can manage all avatars
+      allow write, delete: if isAdmin();
+    }
+    
+    // Temporary uploads - for processing before moving to final location
+    match /temp/{userId}/{imageId} {
+      // Users can upload to their temp folder
+      allow write: if isOwner(userId) && 
+        isValidImageType() && 
+        isValidImageSize();
+      
+      // Users can read their own temp uploads
+      allow read: if isOwner(userId);
+      
+      // Users can delete their own temp uploads
+      allow delete: if isOwner(userId);
+      
+      // Admins can manage all temp uploads
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // System assets - admin only (app icons, default images, etc.)
+    match /system/{imageId} {
+      // Anyone can read system assets
+      allow read: if true;
+      
+      // Only admins can manage system assets
+      allow write, delete: if isAdmin();
+    }
+    
+    // Backup files - admin only
+    match /backups/{backupFile} {
+      // Only admins can access backups
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // Tournament/Event specific galleries
+    match /events/{eventId}/{imageId} {
+      // Anyone can read event images
+      allow read: if true;
+      
+      // Only admins can upload event images
+      allow write: if isAdmin() && 
+        isValidImageType() && 
+        isValidImageSize();
+      
+      // Only admins can delete event images
+      allow delete: if isAdmin();
+    }
+    
+    // User-generated content (if users can upload images in comments, etc.)
+    match /user_content/{userId}/{contentId} {
+      // Users can read all user content
+      allow read: if isAuthenticated();
+      
+      // Users can upload their own content
+      allow write: if isOwner(userId) && 
+        isValidImageType() && 
+        isValidImageSize();
+      
+      // Users can delete their own content
+      allow delete: if isOwner(userId);
+      
+      // Admins can manage all user content (moderation)
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // Analytics/logs storage - admin only
+    match /logs/{logFile} {
+      // Only admins can access log files
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // Deny all other paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// Security considerations:
+//
+// 1. File size limits:
+//    - Images: 10MB max (configurable)
+//    - Prevents storage abuse
+//
+// 2. File type validation:
+//    - Only image types allowed for user uploads
+//    - Prevents malicious file uploads
+//
+// 3. Access control:
+//    - Public read for notification/event images (shareable content)
+//    - User-specific write permissions for personal content
+//    - Admin override for all content management
+//
+// 4. Organized structure:
+//    - /notifications/ - App notification images
+//    - /avatars/{userId}/ - User profile pictures
+//    - /temp/{userId}/ - Temporary uploads for processing
+//    - /system/ - App assets and default images
+//    - /events/{eventId}/ - Tournament/event galleries
+//    - /user_content/{userId}/ - User-generated content
+//    - /backups/ - System backups
+//    - /logs/ - Analytics and error logs
+//
+// 5. Best practices:
+//    - Firestore integration for admin role checking
+//    - Consistent naming conventions
+//    - Proper error handling in app code
+//    - Regular cleanup of temp folders
+//    - Monitoring storage usage and costs

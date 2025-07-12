@@ -1,0 +1,127 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions - moved to top for better organization
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidUserData() {
+      return request.resource.data.keys().hasAll(['email', 'displayName', 'isAdmin', 'createdAt']) &&
+        request.resource.data.email is string &&
+        request.resource.data.email.size() > 0 &&
+        request.resource.data.displayName is string &&
+        request.resource.data.displayName.size() > 0 &&
+        request.resource.data.isAdmin is bool &&
+        request.resource.data.createdAt is timestamp;
+    }
+    
+    function isValidNotificationData() {
+      return request.resource.data.keys().hasAll(['title', 'content', 'type', 'createdAt', 'createdBy', 'isActive']) &&
+        request.resource.data.title is string &&
+        request.resource.data.title.size() > 0 &&
+        request.resource.data.title.size() <= 200 &&
+        request.resource.data.content is string &&
+        request.resource.data.content.size() > 0 &&
+        request.resource.data.content.size() <= 2000 &&
+        request.resource.data.type in ['general', 'tournament', 'camp', 'training'] &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.createdBy is string &&
+        request.resource.data.createdBy == request.auth.uid &&
+        request.resource.data.isActive is bool;
+    }
+    
+    // Users collection - enhanced security
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if isOwner(userId);
+      
+      // Users can create their own profile during registration
+      allow create: if isOwner(userId) && 
+        isValidUserData() &&
+        request.resource.data.isAdmin == false; // New users cannot self-assign admin role
+      
+      // Users can update their own profile (except admin status)
+      allow update: if isOwner(userId) && 
+        isValidUserData() &&
+        request.resource.data.isAdmin == resource.data.isAdmin; // Cannot change admin status
+      
+      // Admins can read all user profiles
+      allow read: if isAdmin();
+      
+      // Admins can update user profiles (including admin status)
+      allow update: if isAdmin() && isValidUserData();
+      
+      // Nobody can delete user profiles
+      allow delete: if false;
+    }
+    
+    // Notifications collection - enhanced validation
+    match /notifications/{notificationId} {
+      // All authenticated users can read active notifications
+      allow read: if isAuthenticated() && resource.data.isActive == true;
+      
+      // Admins can read all notifications (including inactive)
+      allow read: if isAdmin();
+      
+      // Only admins can create notifications
+      allow create: if isAdmin() && isValidNotificationData();
+      
+      // Only admins can update notifications
+      allow update: if isAdmin() && 
+        isValidNotificationData() &&
+        request.resource.data.createdBy == resource.data.createdBy; // Cannot change original creator
+      
+      // Only admins can soft delete (set isActive = false)
+      allow update: if isAdmin() && 
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isActive']) &&
+        request.resource.data.isActive == false;
+      
+      // Hard delete only for admins
+      allow delete: if isAdmin();
+    }
+    
+    // System configuration - admin only
+    match /system/{document} {
+      allow read, write: if isAdmin();
+    }
+    
+    // User analytics - privacy focused
+    match /analytics/{document} {
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+    
+    // FCM tokens - user specific
+    match /fcm_tokens/{tokenId} {
+      allow read, write: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+    }
+    
+    // Error logs - for production monitoring
+    match /error_logs/{logId} {
+      allow create: if isAuthenticated();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+    
+    // Deny all other collections by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
